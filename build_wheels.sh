@@ -64,6 +64,7 @@ VENV_BIN="$VIRTUAL_ENV/bin"
 export PATH="$WRAPPER_PATH:$VENV_BIN:$PATH"
 export CUMM_CUDA_VERSION="$CUDA_VERSION"
 export CUMM_CUDA_ARCH_LIST="$CUDA_ARCH_LIST"
+export TORCH_CUDA_ARCH_LIST="$CUDA_ARCH_LIST"
 
 # 3. Clone / build cumm
 if [ ! -d "cumm" ]; then
@@ -87,10 +88,22 @@ export SPCONV_DISABLE_JIT=1
 python setup.py bdist_wheel
 cd ..
 
-# 5. Move built wheels to dist/ directory
+# 5. Clone / build pytorch_cluster
+if [ ! -d "pytorch_cluster" ]; then
+    git clone https://github.com/rusty1s/pytorch_cluster.git --recursive
+fi
+cd pytorch_cluster
+# Enable Ninja for faster compilation
+sed -i "s/use_ninja=False/use_ninja=True/g" setup.py
+export FORCE_CUDA=1
+python setup.py bdist_wheel
+cd ..
+
+# 6. Move built wheels to dist/ directory
 mkdir -p dist
 mv cumm/dist/*.whl dist/
 mv spconv/dist/*.whl dist/
+mv pytorch_cluster/dist/*.whl dist/
 
 # Cleanup wrappers
 rm -rf bin_wrapper

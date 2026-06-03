@@ -31,3 +31,8 @@ MANIFEST
 venv/
 ENV/
 env/
+
+# Cloned source repos
+cumm/
+spconv/
+pytorch_cluster/
